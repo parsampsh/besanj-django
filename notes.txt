@@ -1,6 +1,0 @@
-Things we need for the account:
-
-- Register API
-- Get Token API
-- Reset Token API
-- Reset Password API
