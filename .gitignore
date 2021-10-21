@@ -3,4 +3,5 @@
 *.pyc
 /.idea/
 /.vscode/
+*.sqlite3
 
