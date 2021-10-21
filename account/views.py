@@ -1,9 +1,37 @@
 from django.http import JsonResponse
+from .models import User, Profile
+from django.contrib.auth.hashers import make_password
+from django.utils.crypto import get_random_string
+from django.views.decorators.http import require_POST
 
 
+@require_POST
 def register(request):
     """ Registers a new User """
-    return JsonResponse({"Hello": "register"})
+    username = request.POST.get('username')
+    email = request.POST.get('email')
+    password = request.POST.get('password')
+
+    if None in (username, email, password):
+        return JsonResponse({'error': "Please fill out all the fields"}, status=400)
+
+    if User.objects.filter(username=username).exists():
+        return JsonResponse({'error': "This username already exists"}, status=409)
+
+    if User.objects.filter(email=email).exists():
+        return JsonResponse({'error': "This email already exists"}, status=409)
+
+    new_user = User(username=username, email=email, password=make_password(password))
+    new_user.save()
+    profile_obj = Profile()
+    profile_obj.api_token = get_random_string(70)
+    profile_obj.user = new_user
+    profile_obj.save()
+
+    return JsonResponse({
+        "message": "You registered successfully!",
+        "api_token": new_user.profile.api_token
+    }, status=201)
 
 
 def get_token(request):
