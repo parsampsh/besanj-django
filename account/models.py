@@ -4,5 +4,5 @@ from django.contrib.auth.models import User
 
 class Profile(models.Model):
     """ Additional data for the User model """
-    user = models.OneToOneField(User)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     api_token = models.CharField(max_length=70) # A token for accessing to the API
