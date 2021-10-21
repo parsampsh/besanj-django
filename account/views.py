@@ -1,7 +1,6 @@
 from django.http import JsonResponse
 from .models import User, Profile
 from django.contrib.auth.hashers import make_password, check_password
-from django.utils.crypto import get_random_string
 from django.views.decorators.http import require_POST
 
 
@@ -43,7 +42,7 @@ def register(request):
     new_user = User(username=username, email=email, password=make_password(password))
     new_user.save()
     profile_obj = Profile()
-    profile_obj.api_token = get_random_string(70)
+    profile_obj.api_token = Profile.generate_unique_token() # TODO : handle unique token
     profile_obj.user = new_user
     profile_obj.save()
 
