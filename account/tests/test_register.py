@@ -3,7 +3,7 @@ from account.models import User
 from django.contrib.auth.hashers import check_password
 
 
-class TestRegisterAndToken(TestCase):
+class TestRegister(TestCase):
     def setUp(self):
         self.client = Client()
         self.user_already_exists = User.objects.create(
