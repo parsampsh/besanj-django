@@ -1,9 +1,28 @@
 from django.http import JsonResponse
 from .models import User, Profile
-from django.contrib.auth.hashers import make_password
+from django.contrib.auth.hashers import make_password, check_password
 from django.utils.crypto import get_random_string
 from django.views.decorators.http import require_POST
 
+
+def _handle_auth_token(request):
+    """ Gets a request object and checks auth token in the headers
+    If token stuff are ok and user is logged in, output is like this:
+    (True, <User object>)
+    Else:
+    (False, <JsonResponse 401>)
+    """
+    token = request.META.get('HTTP_TOKEN')
+
+    if token is None:
+        return False, JsonResponse({'error': "You are not authenticated"}, 401)
+
+    # search for user with this token
+    try:
+        user = User.objects.filter(profile__api_token=token).first()
+        return True, user
+    except:
+        return False, JsonResponse({'error': "Wrong token"}, 401)
 
 @require_POST
 def register(request):
@@ -34,9 +53,28 @@ def register(request):
     }, status=201)
 
 
+@require_POST
 def get_token(request):
     """ Returns token of the user by checking username and password (same as login) """
-    return JsonResponse({"Hello": "get_token"})
+    username = request.POST.get('username')
+    email = request.POST.get('email')
+    password = request.POST.get('password')
+
+    if password is None or username is None and email is None:
+        return JsonResponse({'error': "Please fill out password and email(or username) fields"}, status=400)
+
+    if email is not None:
+        user = User.objects.filter(email=email).first()
+    else:
+        user = User.objects.filter(username=username).first()
+
+    if user is None:
+        return JsonResponse({'error': "Wrong information"}, status=401)
+
+    if not check_password(password, user.password):
+        return JsonResponse({'error': "Wrong information"}, status=401)
+
+    return JsonResponse({"token": user.profile.api_token})
 
 
 def whoami(request):
