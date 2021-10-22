@@ -14,14 +14,13 @@ def _handle_auth_token(request):
     token = request.META.get('HTTP_TOKEN')
 
     if token is None:
-        return False, JsonResponse({'error': "You are not authenticated"}, 401)
+        return False, JsonResponse({'error': "You are not authenticated"}, status=401)
 
     # search for user with this token
-    try:
-        user = User.objects.filter(profile__api_token=token).first()
-        return True, user
-    except:
-        return False, JsonResponse({'error': "Wrong token"}, 401)
+    user = User.objects.filter(profile__api_token=token).first()
+    if user is None:
+        return False, JsonResponse({'error': "Wrong token"}, status=401)
+    return True, user
 
 @require_POST
 def register(request):
@@ -78,7 +77,13 @@ def get_token(request):
 
 def whoami(request):
     """ Returns the user information by the token """
-    return JsonResponse({"Hello": "whoami"})
+    auth_result, user = _handle_auth_token(request)
+    if not auth_result:
+        return user
+
+    return JsonResponse({
+        "user": user.profile.to_json()
+    })
 
 
 def reset_token(request):

@@ -37,3 +37,14 @@ class TestToken(TestCase):
         res = self.client.post('/account/get-token/', {'username': 'u', 'password': '123'})
         self.assertEquals(res.status_code, 200)
         self.assertEquals(res.json()['token'], self.user.profile.api_token)
+
+    def test_user_can_ask_who_they_are(self):
+        res = self.client.get('/account/whoami/', HTTP_TOKEN='something')
+        self.assertEquals(res.status_code, 401)
+        res = self.client.get('/account/whoami/')
+        self.assertEquals(res.status_code, 401)
+
+        token = self.user.profile.api_token
+        res = self.client.get('/account/whoami/', HTTP_TOKEN=token)
+        self.assertEquals(res.status_code, 200)
+        self.assertEquals(res.json(), {'user': self.user.profile.to_json()})
