@@ -5,13 +5,16 @@ from django.views.decorators.http import require_POST
 
 
 def _handle_auth_token(request):
-    """ Gets a request object and checks auth token in the headers
+    """ Gets a request object and checks auth token in the headers (or you can pass the token as string instead)
     If token stuff are ok and user is logged in, output is like this:
     (True, <User object>)
     Else:
     (False, <JsonResponse 401>)
     """
-    token = request.META.get('HTTP_TOKEN')
+    if type(request) is str:
+        token = request
+    else:
+        token = request.META.get('HTTP_TOKEN')
 
     if token is None:
         return False, JsonResponse({'error': "You are not authenticated"}, status=401)
