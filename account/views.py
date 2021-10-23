@@ -25,6 +25,16 @@ def _handle_auth_token(request):
         return False, JsonResponse({'error': "Wrong token"}, status=401)
     return True, user
 
+
+def require_token(func):
+    def decprated_function(request):
+        auth_result, user = _handle_auth_token(request)
+        if not auth_result:
+            return user
+
+        return func(request, user)
+    return decprated_function
+
 @require_POST
 def register(request):
     """ Registers a new User """
@@ -78,12 +88,9 @@ def get_token(request):
     return JsonResponse({"token": user.profile.api_token})
 
 
-def whoami(request):
+@require_token
+def whoami(request, user):
     """ Returns the user information by the token """
-    auth_result, user = _handle_auth_token(request)
-    if not auth_result:
-        return user
-
     return JsonResponse({
         "user": user.profile.to_json()
     })
