@@ -1,3 +1,16 @@
-from django.shortcuts import render
+from django.http import JsonResponse
+from polls.views import require_token
 
-# Create your views here.
+
+@require_token
+def create(request, user):
+    return JsonResponse({})
+
+
+@require_token
+def choice(request, user):
+    return JsonResponse({})
+
+
+def index(request):
+    return JsonResponse({})
