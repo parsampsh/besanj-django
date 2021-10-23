@@ -48,3 +48,15 @@ class TestToken(TestCase):
         res = self.client.get('/account/whoami/', HTTP_TOKEN=token)
         self.assertEquals(res.status_code, 200)
         self.assertEquals(res.json(), {'user': self.user.profile.to_json()})
+
+    def test_user_can_reset_their_token(self):
+        res = self.client.post('/account/reset-token/', HTTP_TOKEN='something')
+        self.assertEquals(res.status_code, 401)
+        res = self.client.post('/account/reset-token/')
+        self.assertEquals(res.status_code, 401)
+
+        token = self.user.profile.api_token
+        res = self.client.post('/account/reset-token/', HTTP_TOKEN=token)
+        self.assertEquals(res.status_code, 200)
+        new_token = res.json()['new_token']
+        self.assertNotEquals(token, new_token)

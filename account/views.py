@@ -100,9 +100,14 @@ def whoami(request, user):
     })
 
 
-def reset_token(request):
+@require_token
+@require_POST
+def reset_token(request, user):
     """ Resets the token of the user """
-    return JsonResponse({"Hello": "reset_token"})
+    user.profile.api_token = Profile.generate_unique_token()
+    user.profile.save()
+
+    return JsonResponse({"new_token": user.profile.api_token})
 
 
 def reset_password(request):
