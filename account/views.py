@@ -27,6 +27,10 @@ def _handle_auth_token(request):
 
 
 def require_token(func):
+    """ A decorator for views they want to require auth using token
+    You should set a second argument as User object
+    The authenticated user using the token will be passed as that argument
+    """
     def decprated_function(request):
         auth_result, user = _handle_auth_token(request)
         if not auth_result:
