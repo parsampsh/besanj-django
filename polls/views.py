@@ -1,5 +1,5 @@
 from django.http import JsonResponse
-from polls.views import require_token
+from account.views import require_token
 
 
 @require_token
