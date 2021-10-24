@@ -1,1 +1,1 @@
-from .test_polls_crud import *
+from .test_polls_management import *

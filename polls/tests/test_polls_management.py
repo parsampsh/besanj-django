@@ -3,7 +3,7 @@ from polls.models import *
 from account.models import Profile
 
 
-class TestPollsCrud(TestCase):
+class TestPollsManagement(TestCase):
     def setUp(self):
         self.client = Client()
         self.user = User(username="a", email="a@a.a", password='123')
