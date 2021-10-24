@@ -12,6 +12,5 @@ class Poll(models.Model):
 class Choice(models.Model):
     poll = models.ForeignKey(Poll, on_delete=models.CASCADE)
     title = models.CharField(max_length=255)
-    description = models.CharField(max_length=1000, null=True)
     sort = models.IntegerField(default=0)
     users = models.ManyToManyField(User)
