@@ -9,9 +9,18 @@ from .models import *
 def create(request, user):
     title = request.POST.get('title')
     description = request.POST.get('description')
+    choices = request.POST.get('choices')
 
     if title is None:
-        return JsonResponse({"error": "Field `title` is required"}, status=400)
+        return JsonResponse({"error": "Field title is required"}, status=400)
+
+    if choices is None:
+        return JsonResponse({"error": "Field choices is required"}, status=400)
+
+    choices = [item.strip() for item in choices.strip().splitlines() if item.strip() != '']
+
+    if len(choices) == 0:
+        return JsonResponse({"error": "Field choices is required"}, status=400)
 
     if len(title) > 255:
         return JsonResponse({"error": "Maximum length for field title is 255"}, status=400)
@@ -25,6 +34,11 @@ def create(request, user):
     poll.title = title
     poll.description = description
     poll.save()
+
+    sort_counter = 0
+    for choice in choices:
+        poll.choice_set.create(title=choice, sort=sort_counter)
+        sort_counter += 1
 
     return JsonResponse({'created_poll_id': poll.id}, status=201)
 
