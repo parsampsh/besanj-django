@@ -32,7 +32,19 @@ def create(request, user):
 @require_token
 @require_POST
 def delete(request, user):
-    return JsonResponse({})
+    poll_id = request.POST.get('poll_id')
+
+    try:
+        poll = Poll.objects.get(pk=poll_id)
+    except:
+        return JsonResponse({'error': 'Invalid poll_id'}, status=404)
+
+    if poll.user.id != user.id:
+        return JsonResponse({'error': 'You cannot delete this poll'}, status=403)
+
+    poll.delete()
+
+    return JsonResponse({'message': 'Poll was deleted'})
 
 
 @require_token
