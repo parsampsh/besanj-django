@@ -49,6 +49,12 @@ def register(request):
     if None in (username, email, password):
         return JsonResponse({'error': "Please fill out all the fields"}, status=400)
 
+    if len(username) > 255:
+        return JsonResponse({'error': "Maximum length for field username is 255"}, status=400)
+
+    if len(email) > 255:
+        return JsonResponse({'error': "Maximum length for field email is 255"}, status=400)
+
     if User.objects.filter(username=username).exists():
         return JsonResponse({'error': "This username already exists"}, status=409)
 

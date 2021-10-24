@@ -18,6 +18,10 @@ class TestRegister(TestCase):
         self.assertEquals(self.client.post('/account/register/', {'email': "a@a.a", "username": "a"}).status_code, 400)
         self.assertEquals(self.client.post('/account/register/', {}).status_code, 400)
 
+        self.assertEquals(self.client.post('/account/register/', {'email': "a"*300}).status_code, 400)
+        self.assertEquals(self.client.post('/account/register/', {'username': "a"*300}).status_code, 400)
+        self.assertEquals(self.client.post('/account/register/', {'username': 'a'*300, 'email': "a"*300}).status_code, 400)
+
     def test_user_cannot_be_registered_with_repeated_username_or_password(self):
         res = self.client.post('/account/register/', {
             "username": "first",
