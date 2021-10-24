@@ -31,31 +31,7 @@ def create(request, user):
 
 @require_token
 @require_POST
-def update(request, user):
-    return JsonResponse({})
-
-
-@require_token
-@require_POST
 def delete(request, user):
-    return JsonResponse({})
-
-
-@require_token
-@require_POST
-def create_choice(request, user):
-    return JsonResponse({})
-
-
-@require_token
-@require_POST
-def update_choice(request, user):
-    return JsonResponse({})
-
-
-@require_token
-@require_POST
-def delete_choice(request, user):
     return JsonResponse({})
 
 
