@@ -7,6 +7,7 @@ from .models import *
 @require_token
 @require_POST
 def create(request, user):
+    """ Creates a new poll """
     title = request.POST.get('title')
     description = request.POST.get('description')
     choices = request.POST.get('choices')
@@ -46,6 +47,7 @@ def create(request, user):
 @require_token
 @require_POST
 def delete(request, user):
+    """ Deletes a poll """
     poll_id = request.POST.get('poll_id')
 
     try:
@@ -64,8 +66,31 @@ def delete(request, user):
 @require_token
 @require_POST
 def choice(request, user):
-    return JsonResponse({})
+    """ Toggles selection of a choice """
+    choice_id = request.POST.get('choice_id')
+    try:
+        choice = Choice.objects.get(pk=choice_id)
+    except:
+        return JsonResponse({'error': 'Choice not found'}, status=404)
+
+    if not choice.poll.is_published:
+        return JsonResponse({'error': 'You cannot vote to this choice'}, status=403)
+
+    all_choices = choice.poll.choice_set.all()
+
+    for ch in all_choices:
+        if ch.id != choice.id:
+            if ch.users.filter(pk=user.id).exists():
+                ch.users.remove(user)
+
+    if choice.users.filter(pk=user.id).exists():
+        choice.users.remove(user)
+    else:
+        choice.users.add(user)
+
+    return JsonResponse({'message': 'Your vote was saved successfully'})
 
 
 def index(request):
+    """ Shows list and details of the polls """
     return JsonResponse({})
