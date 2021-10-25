@@ -93,4 +93,8 @@ def choice(request, user):
 
 def index(request):
     """ Shows list and details of the polls """
+    # NOTES:
+    # we need pagination
+    # we need some filters: polls from a specific user, search, detail of one poll and...
+    # for once item: choices list, vote percent and...
     return JsonResponse({})
