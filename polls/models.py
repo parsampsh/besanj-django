@@ -7,6 +7,7 @@ class Poll(models.Model):
     title = models.CharField(max_length=255)
     description = models.CharField(max_length=1000, null=True)
     is_published = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
 
 
 class Choice(models.Model):
