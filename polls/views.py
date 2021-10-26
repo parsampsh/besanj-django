@@ -1,5 +1,6 @@
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
+from django.core.paginator import Paginator
 from account.views import require_token
 from .models import *
 
@@ -93,8 +94,38 @@ def choice(request, user):
 
 def index(request):
     """ Shows list and details of the polls """
-    # NOTES:
-    # we need pagination
-    # we need some filters: polls from a specific user, search, detail of one poll and...
-    # for once item: choices list, vote percent and...
-    return JsonResponse({})
+    if request.GET.get('user_id') is not None:
+        try:
+            user = User.objects.get(pk=request.GET.get('user_id'))
+        except:
+            return JsonResponse({'error': 'User not found'}, status=404)
+
+        polls = user.poll_set.order_by('-created_at').filter(is_published=True)
+    elif request.GET.get('single_poll_id') is not None:
+        try:
+            polls = [Poll.objects.get(pk=int(request.GET.get('single_poll_id')))]
+        except:
+            return JsonResponse({'error': 'Poll not found'}, status=404)
+
+        if not polls[0].is_published:
+            return JsonResponse({'error': 'Poll not found'}, status=404)
+    else:
+        polls = Poll.objects.order_by('-created_at').filter(is_published=True)
+
+    paginator = Paginator(polls, 50)
+
+    current_page_number = request.GET.get('page') if request.GET.get('page') is not None else 1
+    try:
+        current_page_number = int(current_page_number)
+    except:
+        pass
+    current_page = paginator.get_page(current_page_number)
+
+    current_page_polls = [item.to_json() for item in current_page.object_list]
+
+    return JsonResponse({
+        'polls': current_page_polls,
+        'all_count': paginator.count,
+        'pages_count': paginator.num_pages,
+        'current_page': current_page_number,
+    })
