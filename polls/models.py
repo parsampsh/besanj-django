@@ -40,7 +40,12 @@ class Choice(models.Model):
     def votes_percent(self):
         total_votes = self.poll.total_votes_count()
         votes_to_this = self.votes_count()
-        return (votes_to_this * 100) / total_votes
+        try:
+            percent = (votes_to_this * 100) / total_votes
+            return percent
+        except:
+            pass
+        return 0
 
     def to_json(self):
         return {
