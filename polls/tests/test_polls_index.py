@@ -79,3 +79,20 @@ class TestPollsIndex(TestCase):
 
         res = self.client.get('/polls/?single_poll_id=' + str(poll1.id))
         self.assertEquals(res.status_code, 404)
+
+    def test_polls_index_works_correctly(self):
+        res = self.client.get('/polls/')
+        self.assertEquals(res.status_code, 200)
+        res_json = res.json()
+        self.assertEquals(res_json['all_count'], 175)
+        self.assertEquals(res_json['pages_count'], 4)
+        self.assertEquals(res_json['current_page'], 1)
+        self.assertEquals(len(res_json['polls']), 50)
+
+        res = self.client.get('/polls/?page=4')
+        self.assertEquals(res.status_code, 200)
+        res_json = res.json()
+        self.assertEquals(res_json['all_count'], 175)
+        self.assertEquals(res_json['pages_count'], 4)
+        self.assertEquals(res_json['current_page'], 4)
+        self.assertEquals(len(res_json['polls']), 25)

@@ -2,6 +2,5 @@ polls:
 {
 - add search by text feature to the index api
 - show unpublished polls of user to their self
-- add test for polls index
 - test more stuff about json data for a single poll
 }
