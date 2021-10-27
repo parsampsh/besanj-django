@@ -63,6 +63,20 @@ class TestPollsIndex(TestCase):
         self.assertEquals(res_json['current_page'], 2)
         self.assertEquals(len(res_json['polls']), 50)
 
+        res = self.client.get('/polls/?user_id=' + str(self.user2.id), HTTP_TOKEN='invalid')
+        res_json = res.json()
+        self.assertEquals(res_json['all_count'], 100)
+        self.assertEquals(res_json['pages_count'], 2)
+        self.assertEquals(res_json['current_page'], 1)
+        self.assertEquals(len(res_json['polls']), 50)
+
+        res = self.client.get('/polls/?user_id=' + str(self.user2.id), HTTP_TOKEN=self.user2.profile.api_token)
+        res_json = res.json()
+        self.assertEquals(res_json['all_count'], 200)
+        self.assertEquals(res_json['pages_count'], 4)
+        self.assertEquals(res_json['current_page'], 1)
+        self.assertEquals(len(res_json['polls']), 50)
+
     def test_single_poll_can_be_shown(self):
         poll1 = self.user1.poll_set.all()[0]
         poll1.is_published = False

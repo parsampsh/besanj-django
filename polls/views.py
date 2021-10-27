@@ -1,7 +1,7 @@
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from django.core.paginator import Paginator
-from account.views import require_token
+from account.views import require_token, _handle_auth_token
 from .models import *
 
 
@@ -100,7 +100,11 @@ def index(request):
         except:
             return JsonResponse({'error': 'User not found'}, status=404)
 
-        polls = user.poll_set.order_by('-created_at').filter(is_published=True)
+        auth_result, auth_user = _handle_auth_token(request)
+        if auth_result and auth_user.id == user.id:
+            polls = user.poll_set.order_by('-created_at')
+        else:
+            polls = user.poll_set.order_by('-created_at').filter(is_published=True)
     elif request.GET.get('single_poll_id') is not None:
         try:
             polls = [Poll.objects.get(pk=int(request.GET.get('single_poll_id')))]
