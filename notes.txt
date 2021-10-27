@@ -1,5 +1,4 @@
 polls:
 {
 - add search by text feature to the index api
-- test more stuff about json data for a single poll
 }

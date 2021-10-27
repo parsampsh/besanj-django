@@ -110,3 +110,28 @@ class TestPollsIndex(TestCase):
         self.assertEquals(res_json['pages_count'], 4)
         self.assertEquals(res_json['current_page'], 4)
         self.assertEquals(len(res_json['polls']), 25)
+
+    def test_single_poll_json_data(self):
+        poll = self.user1.poll_set.all()[1]
+        poll.is_published = True
+        poll.save()
+        choice = poll.choice_set.all()[0]
+        choice.users.add(self.user2)
+
+        res = self.client.get('/polls/?single_poll_id=' + str(poll.id))
+        poll_json = res.json()['polls'][0]
+
+        self.assertEquals(poll_json['id'], poll.id)
+        self.assertEquals(poll_json['title'], poll.title)
+        self.assertEquals(poll_json['description'], poll.description)
+        self.assertEquals(poll_json['is_published'], True)
+        self.assertEquals(poll_json['created_at'], str(poll.created_at))
+        self.assertEquals(poll_json['user']['username'], poll.user.username)
+        self.assertEquals(poll_json['user']['email'], poll.user.email)
+
+        self.assertEquals(poll_json['choices'][0]['id'], choice.id)
+        self.assertEquals(poll_json['choices'][0]['title'], choice.title)
+        self.assertEquals(poll_json['choices'][0]['sort'], choice.sort)
+
+        self.assertEquals(poll_json['choices'][0]['votes_count'], 1)
+        self.assertEquals(poll_json['choices'][0]['votes_percent'], 100)
