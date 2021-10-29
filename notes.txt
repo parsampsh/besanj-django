@@ -1,4 +1,0 @@
-polls:
-{
-- add search by text feature to the index api
-}

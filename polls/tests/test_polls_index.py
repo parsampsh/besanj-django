@@ -22,7 +22,7 @@ class TestPollsIndex(TestCase):
                 u = self.user1
             else:
                 u = self.user2
-            poll = Poll(title='poll ' + str(i), user=u)
+            poll = Poll(title='poll ' + str(i), user=u, description='the description')
             if i % 2 == 0:
                 poll.is_published = True
             poll.save()
@@ -135,3 +135,16 @@ class TestPollsIndex(TestCase):
 
         self.assertEquals(poll_json['choices'][0]['votes_count'], 1)
         self.assertEquals(poll_json['choices'][0]['votes_percent'], 100)
+
+    def test_search_works_correctly(self):
+        res = self.client.get('/polls/?search=poll')
+        self.assertEquals(res.json()['all_count'], 175)
+
+        res = self.client.get('/polls/?search=ol')
+        self.assertEquals(res.json()['all_count'], 175)
+
+        res = self.client.get('/polls/?search=hello')
+        self.assertEquals(res.json()['all_count'], 0)
+
+        res = self.client.get('/polls/?search=the des')
+        self.assertEquals(res.json()['all_count'], 175)

@@ -1,6 +1,7 @@
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from django.core.paginator import Paginator
+from django.db.models import Q
 from account.views import require_token, _handle_auth_token
 from .models import *
 
@@ -115,6 +116,12 @@ def index(request):
             return JsonResponse({'error': 'Poll not found'}, status=404)
     else:
         polls = Poll.objects.order_by('-created_at').filter(is_published=True)
+
+    if request.GET.get('search') is not None:
+        searched_phrase = request.GET.get('search')
+        polls = polls.filter(
+            Q(title__contains=searched_phrase) | Q(description__contains=searched_phrase)
+        )
 
     paginator = Paginator(polls, 50)
 
