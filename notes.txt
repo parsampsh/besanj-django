@@ -1,4 +1,3 @@
-- write documentation for the current APIs
 - add an API for user to see her/his own voted polls
 - add multiple select feature for the polls
 - add comments system for the polls

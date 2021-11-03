@@ -28,6 +28,10 @@ def create(request, user):
     if len(title) > 255:
         return JsonResponse({"error": "Maximum length for field title is 255"}, status=400)
 
+    for choice in choices:
+        if len(choice) > 255:
+            return JsonResponse({"error": "Maximum length for each choice is 255"}, status=400)
+
     if description is not None:
         if len(description) > 1000:
             return JsonResponse({"error": "Maximum length for field description is 1000"}, status=400)
