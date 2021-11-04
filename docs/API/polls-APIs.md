@@ -84,3 +84,17 @@ Structure of each item in `polls` key above:
   ]
 }
 ```
+
+### My Votes: `/polls/my_votes/`
+This API shows user their votes polls.
+Requires authentication.
+
+Arguments:
+- `page`: Page number for pagination
+
+Responses:
+- Returns `401` when you are not authenticated
+- Returns `200` when everything is ok
+
+Json response is same like index API, but including one more field in json of each poll.
+It is `selected_choice` that contains id of selected choice by user in that poll.

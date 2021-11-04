@@ -133,13 +133,39 @@ def index(request):
     try:
         current_page_number = int(current_page_number)
     except:
-        pass
+        current_page_number = 1
     current_page = paginator.get_page(current_page_number)
 
     current_page_polls = [item.to_json() for item in current_page.object_list]
 
     return JsonResponse({
         'polls': current_page_polls,
+        'all_count': paginator.count,
+        'pages_count': paginator.num_pages,
+        'current_page': current_page_number,
+    })
+
+
+@require_token
+def my_votes(request, user):
+    """ Shows user's voted polls """
+    choices = user.choice_set.order_by('-poll__created_at').all()
+    paginator = Paginator(choices, 50)
+    current_page_number = request.GET.get('page') if request.GET.get('page') is not None else 1
+    try:
+        current_page_number = int(current_page_number)
+    except:
+        current_page_number = 1
+    choices = paginator.get_page(current_page_number).object_list
+
+    # load polls from choices
+    polls = []
+    for choice in choices:
+        polls.append(choice.poll.to_json())
+        polls[-1]['selected_choice'] = choice.id
+
+    return JsonResponse({
+        'polls': polls,
         'all_count': paginator.count,
         'pages_count': paginator.num_pages,
         'current_page': current_page_number,

@@ -148,3 +148,44 @@ class TestPollsIndex(TestCase):
 
         res = self.client.get('/polls/?search=the des')
         self.assertEquals(res.json()['all_count'], 175)
+
+    def test_user_can_see_their_votes(self):
+        res = self.client.get('/polls/my_votes/')
+        self.assertEquals(res.status_code, 401)
+
+        res = self.client.get('/polls/my_votes/', HTTP_TOKEN=self.user1.profile.api_token)
+        self.assertEquals(res.status_code, 200)
+        res_json = res.json()
+        self.assertEquals(res_json['all_count'], 0)
+        self.assertEquals(res_json['pages_count'], 1)
+        self.assertEquals(res_json['current_page'], 1)
+        self.assertEquals(len(res_json['polls']), 0)
+
+        polls = self.user2.poll_set.filter(is_published=True).all()[0:80]
+        for poll in polls:
+            poll.choice_set.all()[0].users.add(self.user1)
+
+        res = self.client.get('/polls/my_votes/', HTTP_TOKEN=self.user1.profile.api_token)
+        self.assertEquals(res.status_code, 200)
+        res_json = res.json()
+        self.assertEquals(res_json['all_count'], 80)
+        self.assertEquals(res_json['pages_count'], 2)
+        self.assertEquals(res_json['current_page'], 1)
+        self.assertEquals(len(res_json['polls']), 50)
+
+        res = self.client.get('/polls/my_votes/?page=gfdg', HTTP_TOKEN=self.user1.profile.api_token)
+        self.assertEquals(res.status_code, 200)
+        res_json = res.json()
+        self.assertEquals(res_json['all_count'], 80)
+        self.assertEquals(res_json['pages_count'], 2)
+        self.assertEquals(res_json['current_page'], 1)
+        self.assertEquals(len(res_json['polls']), 50)
+
+        res = self.client.get('/polls/my_votes/?page=2', HTTP_TOKEN=self.user1.profile.api_token)
+        self.assertEquals(res.status_code, 200)
+        res_json = res.json()
+        self.assertEquals(res_json['all_count'], 80)
+        self.assertEquals(res_json['pages_count'], 2)
+        self.assertEquals(res_json['current_page'], 2)
+        self.assertEquals(len(res_json['polls']), 30)
+        self.assertTrue('selected_choice' in res_json['polls'][0])
