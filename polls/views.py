@@ -71,7 +71,7 @@ def delete(request, user):
 
 @require_token
 @require_POST
-def choice(request, user):
+def choose(request, user):
     """ Toggles selection of a choice """
     choice_id = request.POST.get('choice_id')
     try:

@@ -21,7 +21,7 @@ Responses:
 - Returns `403` when you are trying to delete another user's poll
 - Returns `200` when the poll is deleted successfully
 
-### Choose: `/polls/choice/` (GET)
+### Choose: `/polls/choose/` (GET)
 This API lets user to select a choice in a poll.
 Requires authentication.
 
