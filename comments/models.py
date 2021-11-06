@@ -8,4 +8,4 @@ class Comment(models.Model):
     poll = models.ForeignKey(Poll, on_delete=models.CASCADE)
     is_published = models.BooleanField(default=False)
     text = models.CharField(max_length=500)
-    # TODO : add a field for recursive reply system
+    parent_comment = models.ForeignKey('self', blank=True)
