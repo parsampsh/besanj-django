@@ -9,3 +9,4 @@ class Comment(models.Model):
     is_published = models.BooleanField(default=False)
     text = models.CharField(max_length=500)
     parent_comment = models.ForeignKey('self', blank=True, null=True, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
