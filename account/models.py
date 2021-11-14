@@ -11,6 +11,7 @@ class Profile(models.Model):
     def to_json(self):
         """ Returns the user information in the json format """
         return {
+            'id': self.user.id,
             'username': self.user.username,
             'email': self.user.email,
         }
