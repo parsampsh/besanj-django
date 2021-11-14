@@ -3,7 +3,7 @@ from .models import *
 from account.models import Profile
 
 
-class TestComment(TestCase):
+class TestCommentCreation(TestCase):
     def setUp(self):
         self.client = Client()
 
