@@ -47,7 +47,19 @@ def send(request, user):
 @require_POST
 def delete(request, user):
     """ User delete their comment """
-    pass
+    comment_id = request.POST.get('comment_id')
+
+    try:
+        comment = Comment.objects.get(pk=int(comment_id))
+    except:
+        return JsonResponse({'error': 'comment not found'}, status=404)
+
+    if comment.user.id is not user.id:
+        return JsonResponse({'error': 'you do not have permission to delete this comment'}, status=403)
+
+    comment.delete()
+
+    return JsonResponse({'message': 'comment deleted'})
 
 
 def comments_by_user(request):

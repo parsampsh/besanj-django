@@ -92,3 +92,43 @@ class TestCommentCreation(TestCase):
         self.assertEquals(res_json['user']['email'], created_comment.user.email)
         self.assertEquals(res_json['is_published'], created_comment.is_published)
         self.assertTrue('parent_comment_id' not in res_json)
+
+
+class TestCommentDeletion(TestCase):
+    def setUp(self):
+        self.client = Client()
+
+        self.user1 = User(username="a", password='123')
+        self.user1.save()
+        self.user1.profile = Profile(api_token='1')
+        self.user1.profile.save()
+
+        self.user2 = User(username="b", password='123')
+        self.user2.save()
+        self.user2.profile = Profile(api_token='2')
+        self.user2.profile.save()
+
+        self.poll1 = Poll.objects.create(title='a', user=self.user1, description='a', is_published=True)
+
+        self.comment1 = Comment.objects.create(user=self.user1, poll=self.poll1, text="test", is_published=True)
+        self.comment2 = Comment.objects.create(user=self.user2, poll=self.poll1, text="hi", is_published=True)
+
+    def test_user_cannot_delete_comment_without_authentication(self):
+        res = self.client.post('/comments/delete/')
+        self.assertEquals(res.status_code, 401)
+
+        res = self.client.post('/comments/delete/', HTTP_TOKEN='1')
+        self.assertEquals(res.status_code, 404)
+
+        res = self.client.post('/comments/delete/', {'comment_id': 12345}, HTTP_TOKEN='1')
+        self.assertEquals(res.status_code, 404)
+
+    def test_user_cannot_delete_comment_of_other_user(self):
+        res = self.client.post('/comments/delete/', {'comment_id': self.comment2.id}, HTTP_TOKEN='1')
+        self.assertEquals(res.status_code, 403)
+
+    def test_user_can_delete_comment(self):
+        res = self.client.post('/comments/delete/', {'comment_id': self.comment1.id}, HTTP_TOKEN='1')
+        self.assertEquals(res.status_code, 200)
+        self.assertFalse(Comment.objects.filter(pk=self.comment1.id).exists())
+
