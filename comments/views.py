@@ -45,7 +45,7 @@ def send(request, user):
 
 @require_token
 @require_POST
-def delete(request):
+def delete(request, user):
     """ User delete their comment """
     pass
 
