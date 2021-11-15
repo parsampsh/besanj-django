@@ -20,6 +20,9 @@ def send(request, user):
     if text is None:
         return error_response('field text is required')
 
+    if len(text) > 500:
+        return error_response('maximum length for field text is 500')
+
     try:
         poll = Poll.objects.get(pk=int(poll_id))
 

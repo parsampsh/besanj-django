@@ -61,6 +61,13 @@ class TestCommentCreation(TestCase):
 
     def test_comment_can_be_sent(self):
         res = self.client.post('/comments/send/', {
+            'text': 'a' * 600,
+            'poll_id': self.poll2.id,
+            'parent_comment_id': self.comment1.id
+        }, HTTP_TOKEN='2')
+        self.assertEquals(res.status_code, 400)
+
+        res = self.client.post('/comments/send/', {
             'text': 'created',
             'poll_id': self.poll2.id,
             'parent_comment_id': self.comment1.id
