@@ -1,3 +1,5 @@
+# Polls APIs
+
 ### Create Poll: `/polls/create/` (POST)
 This API creates a new post. needs authentication.
 

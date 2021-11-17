@@ -101,7 +101,6 @@ def comments_by_user(request):
         'pages_count': paginator.num_pages,
         'current_page': current_page_number,
     })
-        
 
 
 def comments_on_poll(request):
