@@ -1,2 +1,2 @@
-pylint $(find account besanj_backend -type f -name "*.py")
+pylint $(find account besanj_backend polls comments -type f -name "*.py")
 
