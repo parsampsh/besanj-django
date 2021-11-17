@@ -139,3 +139,58 @@ class TestCommentDeletion(TestCase):
         self.assertEquals(res.status_code, 200)
         self.assertFalse(Comment.objects.filter(pk=self.comment1.id).exists())
 
+
+class TestCommentsList(TestCase):
+    def setUp(self):
+        self.client = Client()
+
+        self.user1 = User(username="a", password='123')
+        self.user1.save()
+        self.user1.profile = Profile(api_token='1')
+        self.user1.profile.save()
+
+        self.user2 = User(username="b", password='123')
+        self.user2.save()
+        self.user2.profile = Profile(api_token='2')
+        self.user2.profile.save()
+
+        self.poll1 = Poll.objects.create(title='a', user=self.user1, description='a', is_published=True)
+
+        self.comment1 = Comment.objects.create(user=self.user1, poll=self.poll1, text="a", is_published=True)
+        self.comment2 = Comment.objects.create(user=self.user1, poll=self.poll1, text="b", is_published=True)
+        self.comment3 = Comment.objects.create(user=self.user1, poll=self.poll1, text="c", is_published=True)
+        self.comment4 = Comment.objects.create(user=self.user2, poll=self.poll1, text="1", is_published=True)
+        self.comment5 = Comment.objects.create(user=self.user2, poll=self.poll1, text="2", is_published=True)
+        self.comment6 = Comment.objects.create(user=self.user2, poll=self.poll1, text="3", is_published=False)
+
+    def test_comments_by_user_will_be_returned_correctly(self):
+        res = self.client.get('/comments/user_comments/')
+        self.assertEquals(res.status_code, 400)
+
+        res = self.client.get('/comments/user_comments/?user_id=123456')
+        self.assertEquals(res.status_code, 404)
+
+        res = self.client.get('/comments/user_comments/?user_id=' + str(self.user2.id))
+        self.assertEquals(res.status_code, 200)
+        self.assertEquals(len(res.json()['comments']), 2)
+
+        res = self.client.get('/comments/user_comments/?user_id=' + str(self.user2.id), HTTP_TOKEN='2')
+        self.assertEquals(res.status_code, 200)
+        self.assertEquals(len(res.json()['comments']), 3)
+
+        self.assertEquals(res.json()['all_count'], 3)
+        self.assertEquals(res.json()['pages_count'], 1)
+        self.assertEquals(res.json()['current_page'], 1)
+
+    def test_comments_by_poll_will_be_returned_correctly(self):
+        res = self.client.get('/comments/poll_comments/')
+        self.assertEquals(res.status_code, 400)
+
+        res = self.client.get('/comments/poll_comments/?poll_id=123456')
+        self.assertEquals(res.status_code, 404)
+
+        res = self.client.get('/comments/poll_comments/?poll_id=' + str(self.poll1.id))
+        self.assertEquals(res.status_code, 200)
+        self.assertEquals(len(res.json()['comments']), 5)
+
+        self.assertEquals(res.json()['comments'][0]['id'], self.comment5.id)

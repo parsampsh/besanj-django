@@ -1,7 +1,8 @@
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
-from account.views import require_token
+from account.views import require_token, _handle_auth_token
 from .models import *
+from django.core.paginator import Paginator
 
 
 @require_POST
@@ -67,9 +68,70 @@ def delete(request, user):
 
 def comments_by_user(request):
     """ List of comments by a spesific user """
-    pass
+    user_id = request.GET.get('user_id')
+
+    if user_id is None:
+        return JsonResponse({'error': 'parameter user_id is required'}, status=400)
+
+    try:
+        user = User.objects.get(pk=user_id)
+    except:
+        return JsonResponse({'error': 'user not found'}, status=404)
+
+    auth_result, auth_user = _handle_auth_token(request)
+    if auth_result and auth_user.id == user.id:
+        comments = user.comment_set.order_by('-created_at')
+    else:
+        comments = user.comment_set.order_by('-created_at').filter(is_published=True)
+
+    paginator = Paginator(comments, 50)
+
+    current_page_number = request.GET.get('page') if request.GET.get('page') is not None else 1
+    try:
+        current_page_number = int(current_page_number)
+    except:
+        current_page_number = 1
+    current_page = paginator.get_page(current_page_number)
+
+    current_page_comments = [item.to_json() for item in current_page.object_list]
+
+    return JsonResponse({
+        'comments': current_page_comments,
+        'all_count': paginator.count,
+        'pages_count': paginator.num_pages,
+        'current_page': current_page_number,
+    })
+        
 
 
 def comments_on_poll(request):
     """ List of comments on a spesific poll """
-    pass
+    poll_id = request.GET.get('poll_id')
+
+    if poll_id is None:
+        return JsonResponse({'error': 'parameter poll_id is required'}, status=400)
+
+    try:
+        poll = Poll.objects.get(pk=poll_id)
+    except:
+        return JsonResponse({'error': 'poll not found'}, status=404)
+
+    comments = poll.comment_set.order_by('-created_at').filter(is_published=True)
+
+    paginator = Paginator(comments, 50)
+
+    current_page_number = request.GET.get('page') if request.GET.get('page') is not None else 1
+    try:
+        current_page_number = int(current_page_number)
+    except:
+        current_page_number = 1
+    current_page = paginator.get_page(current_page_number)
+
+    current_page_comments = [item.to_json() for item in current_page.object_list]
+
+    return JsonResponse({
+        'comments': current_page_comments,
+        'all_count': paginator.count,
+        'pages_count': paginator.num_pages,
+        'current_page': current_page_number,
+    })
