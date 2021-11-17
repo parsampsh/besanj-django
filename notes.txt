@@ -1,4 +1,3 @@
-- add comments system for the polls
 - clean up and improve the code
 - write workflows
 - write Dockerfile
