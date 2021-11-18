@@ -2,7 +2,7 @@ from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from account.views import require_token, _handle_auth_token
 from .models import *
-from django.core.paginator import Paginator
+from besanj_backend.pagination_policy import paginate
 
 
 @require_POST
@@ -84,23 +84,7 @@ def comments_by_user(request):
     else:
         comments = user.comment_set.order_by('-created_at').filter(is_published=True)
 
-    paginator = Paginator(comments, 50)
-
-    current_page_number = request.GET.get('page') if request.GET.get('page') is not None else 1
-    try:
-        current_page_number = int(current_page_number)
-    except:
-        current_page_number = 1
-    current_page = paginator.get_page(current_page_number)
-
-    current_page_comments = [item.to_json() for item in current_page.object_list]
-
-    return JsonResponse({
-        'comments': current_page_comments,
-        'all_count': paginator.count,
-        'pages_count': paginator.num_pages,
-        'current_page': current_page_number,
-    })
+    return paginate(comments, request, items_name='comments')
 
 
 def comments_on_poll(request):
@@ -117,20 +101,4 @@ def comments_on_poll(request):
 
     comments = poll.comment_set.order_by('-created_at').filter(is_published=True)
 
-    paginator = Paginator(comments, 50)
-
-    current_page_number = request.GET.get('page') if request.GET.get('page') is not None else 1
-    try:
-        current_page_number = int(current_page_number)
-    except:
-        current_page_number = 1
-    current_page = paginator.get_page(current_page_number)
-
-    current_page_comments = [item.to_json() for item in current_page.object_list]
-
-    return JsonResponse({
-        'comments': current_page_comments,
-        'all_count': paginator.count,
-        'pages_count': paginator.num_pages,
-        'current_page': current_page_number,
-    })
+    return paginate(comments, request, items_name='comments')
