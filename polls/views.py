@@ -1,6 +1,5 @@
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
-from django.core.paginator import Paginator
 from django.db.models import Q
 from account.views import require_token, _handle_auth_token
 from .models import *
