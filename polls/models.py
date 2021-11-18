@@ -13,9 +13,9 @@ class Poll(models.Model):
         """ Returns count of total votes to this poll """
         return sum([item.votes_count() for item in self.choice_set.all()])
 
-    def to_json(self):
+    def to_json(self, include_selected_choice_id=None):
         """ Returns the information of the poll in the json format """
-        return {
+        output = {
             'id': self.id,
             'title': self.title,
             'description': self.description,
@@ -25,6 +25,11 @@ class Poll(models.Model):
             'total_votes_count': self.total_votes_count(),
             'user': self.user.profile.to_json(),
         }
+
+        if include_selected_choice_id is not None:
+            output['selected_choice'] = include_selected_choice_id
+
+        return output
 
 
 class Choice(models.Model):
