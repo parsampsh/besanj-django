@@ -26,23 +26,23 @@ class TestCommentCreation(TestCase):
 
     def test_user_cannot_send_comment_without_authentication(self):
         res = self.client.post('/comments/send/')
-        self.assertEquals(res.status_code, 401)
+        self.assertEqual(res.status_code, 401)
 
         res = self.client.post('/comments/send/', HTTP_TOKEN='2')
-        self.assertEquals(res.status_code, 400)
+        self.assertEqual(res.status_code, 400)
 
         res = self.client.post('/comments/send/', {'poll_id': 123}, HTTP_TOKEN='2')
-        self.assertEquals(res.status_code, 400)
+        self.assertEqual(res.status_code, 400)
 
         res = self.client.post('/comments/send/', {'text': 'test'}, HTTP_TOKEN='2')
-        self.assertEquals(res.status_code, 400)
+        self.assertEqual(res.status_code, 400)
 
     def test_comment_cannot_be_sent_on_wrong_poll(self):
         res = self.client.post('/comments/send/', {'text': 'test', 'poll_id': 12345}, HTTP_TOKEN='2')
-        self.assertEquals(res.status_code, 404)
+        self.assertEqual(res.status_code, 404)
 
         res = self.client.post('/comments/send/', {'text': 'test', 'poll_id': self.poll3.id}, HTTP_TOKEN='2')
-        self.assertEquals(res.status_code, 404)
+        self.assertEqual(res.status_code, 404)
 
     def test_comment_cannot_be_sent_on_wrong_parent_comment(self):
         res = self.client.post('/comments/send/', {
@@ -50,14 +50,14 @@ class TestCommentCreation(TestCase):
             'poll_id': self.poll2.id,
             'parent_comment_id': 12345
         }, HTTP_TOKEN='2')
-        self.assertEquals(res.status_code, 404)
+        self.assertEqual(res.status_code, 404)
 
         res = self.client.post('/comments/send/', {
             'text': 'test',
             'poll_id': self.poll2.id,
             'parent_comment_id': self.comment2.id
         }, HTTP_TOKEN='2')
-        self.assertEquals(res.status_code, 404)
+        self.assertEqual(res.status_code, 404)
 
     def test_comment_can_be_sent(self):
         res = self.client.post('/comments/send/', {
@@ -65,39 +65,39 @@ class TestCommentCreation(TestCase):
             'poll_id': self.poll2.id,
             'parent_comment_id': self.comment1.id
         }, HTTP_TOKEN='2')
-        self.assertEquals(res.status_code, 400)
+        self.assertEqual(res.status_code, 400)
 
         res = self.client.post('/comments/send/', {
             'text': 'created',
             'poll_id': self.poll2.id,
             'parent_comment_id': self.comment1.id
         }, HTTP_TOKEN='2')
-        self.assertEquals(res.status_code, 201)
+        self.assertEqual(res.status_code, 201)
         res_json = res.json()['created_comment']
 
         created_comment = Comment.objects.filter(text='created', poll=self.poll2, parent_comment=self.comment1).get()
-        self.assertEquals(created_comment.user.id, self.user2.id)
+        self.assertEqual(created_comment.user.id, self.user2.id)
 
-        self.assertEquals(res_json['id'], created_comment.id)
-        self.assertEquals(res_json['poll_id'], created_comment.poll.id)
-        self.assertEquals(res_json['parent_comment_id'], created_comment.parent_comment.id)
-        self.assertEquals(res_json['user']['email'], created_comment.user.email)
-        self.assertEquals(res_json['is_published'], created_comment.is_published)
+        self.assertEqual(res_json['id'], created_comment.id)
+        self.assertEqual(res_json['poll_id'], created_comment.poll.id)
+        self.assertEqual(res_json['parent_comment_id'], created_comment.parent_comment.id)
+        self.assertEqual(res_json['user']['email'], created_comment.user.email)
+        self.assertEqual(res_json['is_published'], created_comment.is_published)
 
         res = self.client.post('/comments/send/', {
             'text': 'sent',
             'poll_id': self.poll1.id,
         }, HTTP_TOKEN='1')
-        self.assertEquals(res.status_code, 201)
+        self.assertEqual(res.status_code, 201)
         res_json = res.json()['created_comment']
 
         created_comment = Comment.objects.filter(text='sent', poll=self.poll1, parent_comment=None).get()
-        self.assertEquals(created_comment.user.id, self.user1.id)
+        self.assertEqual(created_comment.user.id, self.user1.id)
 
-        self.assertEquals(res_json['id'], created_comment.id)
-        self.assertEquals(res_json['poll_id'], created_comment.poll.id)
-        self.assertEquals(res_json['user']['email'], created_comment.user.email)
-        self.assertEquals(res_json['is_published'], created_comment.is_published)
+        self.assertEqual(res_json['id'], created_comment.id)
+        self.assertEqual(res_json['poll_id'], created_comment.poll.id)
+        self.assertEqual(res_json['user']['email'], created_comment.user.email)
+        self.assertEqual(res_json['is_published'], created_comment.is_published)
         self.assertTrue('parent_comment_id' not in res_json)
 
 
@@ -122,21 +122,21 @@ class TestCommentDeletion(TestCase):
 
     def test_user_cannot_delete_comment_without_authentication(self):
         res = self.client.post('/comments/delete/')
-        self.assertEquals(res.status_code, 401)
+        self.assertEqual(res.status_code, 401)
 
         res = self.client.post('/comments/delete/', HTTP_TOKEN='1')
-        self.assertEquals(res.status_code, 404)
+        self.assertEqual(res.status_code, 404)
 
         res = self.client.post('/comments/delete/', {'comment_id': 12345}, HTTP_TOKEN='1')
-        self.assertEquals(res.status_code, 404)
+        self.assertEqual(res.status_code, 404)
 
     def test_user_cannot_delete_comment_of_other_user(self):
         res = self.client.post('/comments/delete/', {'comment_id': self.comment2.id}, HTTP_TOKEN='1')
-        self.assertEquals(res.status_code, 403)
+        self.assertEqual(res.status_code, 403)
 
     def test_user_can_delete_comment(self):
         res = self.client.post('/comments/delete/', {'comment_id': self.comment1.id}, HTTP_TOKEN='1')
-        self.assertEquals(res.status_code, 200)
+        self.assertEqual(res.status_code, 200)
         self.assertFalse(Comment.objects.filter(pk=self.comment1.id).exists())
 
 
@@ -165,32 +165,32 @@ class TestCommentsList(TestCase):
 
     def test_comments_by_user_will_be_returned_correctly(self):
         res = self.client.get('/comments/user_comments/')
-        self.assertEquals(res.status_code, 400)
+        self.assertEqual(res.status_code, 400)
 
         res = self.client.get('/comments/user_comments/?user_id=123456')
-        self.assertEquals(res.status_code, 404)
+        self.assertEqual(res.status_code, 404)
 
         res = self.client.get('/comments/user_comments/?user_id=' + str(self.user2.id))
-        self.assertEquals(res.status_code, 200)
-        self.assertEquals(len(res.json()['comments']), 2)
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(len(res.json()['comments']), 2)
 
         res = self.client.get('/comments/user_comments/?user_id=' + str(self.user2.id), HTTP_TOKEN='2')
-        self.assertEquals(res.status_code, 200)
-        self.assertEquals(len(res.json()['comments']), 3)
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(len(res.json()['comments']), 3)
 
-        self.assertEquals(res.json()['all_count'], 3)
-        self.assertEquals(res.json()['pages_count'], 1)
-        self.assertEquals(res.json()['current_page'], 1)
+        self.assertEqual(res.json()['all_count'], 3)
+        self.assertEqual(res.json()['pages_count'], 1)
+        self.assertEqual(res.json()['current_page'], 1)
 
     def test_comments_by_poll_will_be_returned_correctly(self):
         res = self.client.get('/comments/poll_comments/')
-        self.assertEquals(res.status_code, 400)
+        self.assertEqual(res.status_code, 400)
 
         res = self.client.get('/comments/poll_comments/?poll_id=123456')
-        self.assertEquals(res.status_code, 404)
+        self.assertEqual(res.status_code, 404)
 
         res = self.client.get('/comments/poll_comments/?poll_id=' + str(self.poll1.id))
-        self.assertEquals(res.status_code, 200)
-        self.assertEquals(len(res.json()['comments']), 5)
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(len(res.json()['comments']), 5)
 
-        self.assertEquals(res.json()['comments'][0]['id'], self.comment5.id)
+        self.assertEqual(res.json()['comments'][0]['id'], self.comment5.id)
