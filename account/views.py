@@ -31,13 +31,13 @@ def require_token(func):
     You should set a second argument as User object
     The authenticated user using the token will be passed as that argument
     """
-    def decprated_function(request):
+    def decorated_function(request):
         auth_result, user = _handle_auth_token(request)
         if not auth_result:
             return user
 
         return func(request, user)
-    return decprated_function
+    return decorated_function
 
 @require_POST
 def register(request):
