@@ -47,7 +47,7 @@ def create(request, user):
         poll.choice_set.create(title=choice, sort=sort_counter)
         sort_counter += 1
 
-    return JsonResponse({'created_poll_id': poll.id}, status=201)
+    return JsonResponse({'created_poll': poll.to_json()}, status=201)
 
 
 @require_token

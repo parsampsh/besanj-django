@@ -10,7 +10,7 @@ Arguments:
 
 Responses:
 - Returns `400` when some required fields are not sent or length of some fields are more than maximum
-- Returns `201` when the poll is created successfully with `created_poll_id` is json responses
+- Returns `201` when the poll is created successfully with `created_poll` in json responses (see structure of the json data in the next sections of this document)
 
 ### Delete Poll: `/polls/delete/` (POST)
 This API deletes a poll and requires authentication.

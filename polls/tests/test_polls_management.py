@@ -77,7 +77,7 @@ class TestPollsManagement(TestCase):
             'choices': 'a\nb',
         }, HTTP_TOKEN='test')
         self.assertEquals(res.status_code, 201)
-        created_poll_id = res.json()['created_poll_id']
+        created_poll_id = res.json()['created_poll']['id']
         created_poll = Poll.objects.get(pk=created_poll_id)
 
         self.assertEquals(created_poll.title, 'The Title')
