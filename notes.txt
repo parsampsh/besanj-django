@@ -1,5 +1,4 @@
 - clean up and improve the code
-- write workflows
 - write Dockerfile
 - add reset password API
 - add multiple select feature for the polls
