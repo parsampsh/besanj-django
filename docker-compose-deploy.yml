@@ -1,0 +1,17 @@
+version: '3.7'
+
+services:
+  app:
+    build:
+      context: .
+    environment:
+      - SECRET_KEY=samplesecret123
+      - DEBUG=0
+
+  nginx:
+    build:
+      context: ./nginx_config
+    ports:
+      - "8080:8080"
+    depends_on:
+      - app
