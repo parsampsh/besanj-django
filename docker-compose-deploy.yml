@@ -5,7 +5,7 @@ services:
     build:
       context: .
     environment:
-      - SECRET_KEY=samplesecret123
+      - SECRET_KEY=${APP_SECRET_KEY}
       - DEBUG=0
     depends_on:
       - db

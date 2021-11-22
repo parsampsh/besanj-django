@@ -14,4 +14,6 @@ RUN chmod +x /app/scripts/*
 RUN adduser -D user
 USER user
 
+RUN python3 manage.py migrate
+
 CMD ["entrypoint.sh"]
