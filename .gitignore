@@ -4,4 +4,4 @@
 /.idea/
 /.vscode/
 *.sqlite3
-
+/.env
