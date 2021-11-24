@@ -13,7 +13,7 @@ COPY . /app
 WORKDIR /app
 RUN chmod +x /app/scripts/*
 
-RUN rm *.sqlite3
+RUN rm db.sqlite3 -f
 
 RUN adduser -D user
 USER user
