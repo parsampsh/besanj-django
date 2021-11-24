@@ -6,7 +6,10 @@ services:
       context: .
     environment:
       - SECRET_KEY=${APP_SECRET_KEY}
-      - DEBUG=0
+      - APP_DEBUG=0
+      - MYSQL_DATABASE="${MYSQL_DATABASE}"
+      - MYSQL_USER="${MYSQL_USER}"
+      - MYSQL_PASSWORD="${MYSQL_PASSWORD}"
     depends_on:
       - db
 
