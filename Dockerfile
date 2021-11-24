@@ -11,9 +11,9 @@ COPY . /app
 WORKDIR /app
 RUN chmod +x /app/scripts/*
 
+RUN rm *.sqlite3
+
 RUN adduser -D user
 USER user
-
-RUN python3 manage.py migrate
 
 CMD ["entrypoint.sh"]
