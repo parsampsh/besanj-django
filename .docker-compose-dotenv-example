@@ -1,0 +1,7 @@
+# Copy this file to .env when you want to run docker-compose-deploy.yml
+
+MYSQL_DATABASE=besanj
+MYSQL_USER=besanj
+MYSQL_PASSWORD=123
+MYSQL_ROOT_PASSWORD=123
+APP_SECRET_KEY=helloworld
