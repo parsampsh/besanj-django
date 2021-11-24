@@ -44,3 +44,17 @@ $ docker-compose up
 ```
 
 then the server is accessible on `http://localhost:8000`.
+
+### Running the tests
+For running project tests:
+
+```shell
+$ python3 manage.py test
+```
+
+or if you use docker compose for development:
+
+```shell
+$ sudo docker exec <app-container> python manage.py test
+```
+
