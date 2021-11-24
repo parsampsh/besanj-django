@@ -7,6 +7,8 @@ RUN apk add --update --no-cache --virtual .tmp gcc libc-dev linux-headers mariad
 RUN pip install -r /requirements.txt
 RUN apk del .tmp
 
+RUN apk add --update --no-cache mariadb-connector-c
+
 COPY . /app
 WORKDIR /app
 RUN chmod +x /app/scripts/*
