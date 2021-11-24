@@ -7,9 +7,9 @@ services:
     environment:
       - SECRET_KEY=${APP_SECRET_KEY}
       - APP_DEBUG=0
-      - MYSQL_DATABASE="${MYSQL_DATABASE}"
-      - MYSQL_USER="${MYSQL_USER}"
-      - MYSQL_PASSWORD="${MYSQL_PASSWORD}"
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
       - MYSQL_HOST=db
     depends_on:
       - db
