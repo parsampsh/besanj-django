@@ -1,3 +1,1 @@
 - add reset password API
-- add multiple select feature for the polls
-- add quiz type for the polls
