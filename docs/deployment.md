@@ -22,3 +22,13 @@ $ sudo docker exec <app-container-id> python manage.py migrate
 
 Now, app is ready on http://localhost:8080
 
+Also if you want change default port `8080` to something else, you can update file `.env` and change this line:
+
+```
+...
+PRODUCTION_PORT=80 # or whatever you want
+...
+```
+
+And re-run docker compose command.
+
