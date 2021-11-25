@@ -64,7 +64,7 @@ def register(request):
     new_user = User(username=username, email=email, password=make_password(password))
     new_user.save()
     profile_obj = Profile()
-    profile_obj.api_token = Profile.generate_unique_token() # TODO : handle unique token
+    profile_obj.api_token = Profile.generate_unique_token()
     profile_obj.user = new_user
     profile_obj.save()
 

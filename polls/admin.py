@@ -4,7 +4,7 @@ from .models import *
 
 @admin.register(Poll)
 class PollAdmin(admin.ModelAdmin):
-    pass # TODO : config me
+    pass
 
 
 @admin.register(Choice)
