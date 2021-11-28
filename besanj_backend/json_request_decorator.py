@@ -8,7 +8,7 @@ def json_request(func):
     """
     def decorated_function(request):
         try:
-            data = json.loads(request.raw_post_data)
+            data = json.loads(request.body)
             request.POST = data
         except:
             pass
