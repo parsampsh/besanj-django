@@ -3,8 +3,10 @@ from django.views.decorators.http import require_POST
 from account.views import require_token, _handle_auth_token
 from .models import *
 from besanj_backend.pagination_policy import paginate
+from besanj_backend.json_request_decorator import json_request
 
 
+@json_request
 @require_POST
 @require_token
 def send(request, user):
@@ -47,8 +49,9 @@ def send(request, user):
     return JsonResponse({'created_comment': comment.to_json()}, status=201)
 
 
-@require_token
+@json_request
 @require_POST
+@require_token
 def delete(request, user):
     """ User delete their comment """
     comment_id = request.POST.get('comment_id')

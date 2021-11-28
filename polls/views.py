@@ -4,10 +4,12 @@ from django.db.models import Q
 from account.views import require_token, _handle_auth_token
 from .models import *
 from besanj_backend.pagination_policy import paginate
+from besanj_backend.json_request_decorator import json_request
 
 
-@require_token
+@json_request
 @require_POST
+@require_token
 def create(request, user):
     """ Creates a new poll """
     title = request.POST.get('title')
@@ -50,8 +52,9 @@ def create(request, user):
     return JsonResponse({'created_poll': poll.to_json()}, status=201)
 
 
-@require_token
+@json_request
 @require_POST
+@require_token
 def delete(request, user):
     """ Deletes a poll """
     poll_id = request.POST.get('poll_id')
@@ -69,8 +72,9 @@ def delete(request, user):
     return JsonResponse({'message': 'Poll was deleted'})
 
 
-@require_token
+@json_request
 @require_POST
+@require_token
 def choose(request, user):
     """ Toggles selection of a choice """
     choice_id = request.POST.get('choice_id')

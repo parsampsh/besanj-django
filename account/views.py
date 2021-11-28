@@ -2,6 +2,7 @@ from django.http import JsonResponse
 from .models import User, Profile
 from django.contrib.auth.hashers import make_password, check_password
 from django.views.decorators.http import require_POST
+from besanj_backend.json_request_decorator import json_request
 
 
 def _handle_auth_token(request):
@@ -39,6 +40,7 @@ def require_token(func):
         return func(request, user)
     return decorated_function
 
+@json_request
 @require_POST
 def register(request):
     """ Registers a new User """
@@ -74,6 +76,7 @@ def register(request):
     }, status=201)
 
 
+@json_request
 @require_POST
 def get_token(request):
     """ Returns token of the user by checking username and password (same as login) """
@@ -106,8 +109,9 @@ def whoami(request, user):
     })
 
 
-@require_token
+@json_request
 @require_POST
+@require_token
 def reset_token(request, user):
     """ Resets the token of the user """
     user.profile.api_token = Profile.generate_unique_token()
