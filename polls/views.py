@@ -98,7 +98,7 @@ def choose(request, user):
     else:
         choice.users.add(user)
 
-    return JsonResponse({'message': 'Your vote was saved successfully'})
+    return JsonResponse({'message': 'Your vote was saved successfully', 'updated_poll': choice.poll.to_json()})
 
 
 def index(request):

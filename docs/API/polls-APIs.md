@@ -35,6 +35,18 @@ Responses:
 - Returns `403` when the poll is not published yet
 - Returns `200` when you voted successfully
 
+Json response:
+
+```json
+{
+	"message": "...",
+	"updated_poll": {...poll object...}
+}
+```
+
+The `updated_poll` contains information of the poll and it's choices after voting (percents and counts will be updated).
+You can replace these information with those which were shown in the front end app after user voted.
+
 ### Index: `/polls/`
 This API returns list of polls with some filters.
 Does not require authentication but authentication makes more features for it.
