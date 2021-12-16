@@ -99,6 +99,9 @@ Structure of each item in `polls` key above:
 }
 ```
 
+There can be a `selected_choice` key in poll json. But it happens only when a user is authenticated and calls this API.
+Then for each poll, IF user has voted to it before, `selected_choice` key will be included which contains ID of selected choice on this poll by user.
+
 ### My Votes: `/polls/my_votes/`
 This API shows user their votes polls.
 Requires authentication.

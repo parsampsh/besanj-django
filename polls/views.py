@@ -103,13 +103,15 @@ def choose(request, user):
 
 def index(request):
     """ Shows list and details of the polls """
+    auth_result, auth_user = _handle_auth_token(request)
+    if not auth_result:
+        auth_user = None
     if request.GET.get('user_id') is not None:
         try:
             user = User.objects.get(pk=request.GET.get('user_id'))
         except:
             return JsonResponse({'error': 'User not found'}, status=404)
 
-        auth_result, auth_user = _handle_auth_token(request)
         if auth_result and auth_user.id == user.id:
             polls = user.poll_set.order_by('-created_at')
         else:
@@ -131,7 +133,7 @@ def index(request):
             Q(title__contains=searched_phrase) | Q(description__contains=searched_phrase)
         )
 
-    return paginate(polls, request, items_name='polls')
+    return paginate(polls, request, items_name='polls', item_json=lambda poll: poll.to_json(user=auth_user))
 
 
 @require_token

@@ -189,3 +189,18 @@ class TestPollsIndex(TestCase):
         self.assertEqual(res_json['current_page'], 2)
         self.assertEqual(len(res_json['polls']), 30)
         self.assertTrue('selected_choice' in res_json['polls'][0])
+
+        self.user1.choice_set.clear()
+        polls = Poll.objects.order_by('-created_at').filter(is_published=True).all()[0:80]
+        for poll in polls:
+            poll.choice_set.all()[0].users.add(self.user1)
+
+        res = self.client.get('/polls/?page=2', HTTP_TOKEN=self.user1.profile.api_token)
+        self.assertEqual(res.status_code, 200)
+        res_json = res.json()
+        self.assertEqual(res_json['all_count'], 175)
+        self.assertEqual(res_json['pages_count'], 4)
+        self.assertEqual(res_json['current_page'], 2)
+        self.assertEqual(len(res_json['polls']), 50)
+        self.assertTrue('selected_choice' in res_json['polls'][0])
+        self.assertFalse('selected_choice' in res_json['polls'][40])
