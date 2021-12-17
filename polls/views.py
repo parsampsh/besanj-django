@@ -141,4 +141,10 @@ def my_votes(request, user):
     """ Shows user's voted polls """
     choices = user.choice_set.order_by('-poll__created_at').all()
 
+    if request.GET.get('search') is not None:
+        searched_phrase = request.GET.get('search')
+        choices = choices.filter(
+            Q(poll__title__contains=searched_phrase) | Q(poll__description__contains=searched_phrase)
+        )
+
     return paginate(choices, request, items_name='polls', item_json=lambda choice: choice.poll.to_json(include_selected_choice_id=choice.id))

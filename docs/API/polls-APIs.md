@@ -108,6 +108,7 @@ Requires authentication.
 
 Arguments:
 - `page`: Page number for pagination
+- `search`: Just like the previous API allows you to search by title or description (optional)
 
 Responses:
 - Returns `401` when you are not authenticated

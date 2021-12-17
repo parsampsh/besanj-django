@@ -173,6 +173,23 @@ class TestPollsIndex(TestCase):
         self.assertEqual(res_json['current_page'], 1)
         self.assertEqual(len(res_json['polls']), 50)
 
+        res = self.client.get('/polls/my_votes/?search=320', HTTP_TOKEN=self.user1.profile.api_token)
+        self.assertEqual(res.status_code, 200)
+        res_json = res.json()
+        self.assertEqual(res_json['all_count'], 0)
+        self.assertEqual(res_json['pages_count'], 1)
+        self.assertEqual(res_json['current_page'], 1)
+        self.assertEqual(len(res_json['polls']), 0)
+
+        res = self.client.get('/polls/my_votes/?search=308', HTTP_TOKEN=self.user1.profile.api_token)
+        self.assertEqual(res.status_code, 200)
+        res_json = res.json()
+        self.assertEqual(res_json['all_count'], 1)
+        self.assertEqual(res_json['pages_count'], 1)
+        self.assertEqual(res_json['current_page'], 1)
+        self.assertEqual(len(res_json['polls']), 1)
+        self.assertEqual(res_json['polls'][0]['title'], 'poll 308')
+
         res = self.client.get('/polls/my_votes/?page=gfdg', HTTP_TOKEN=self.user1.profile.api_token)
         self.assertEqual(res.status_code, 200)
         res_json = res.json()
