@@ -69,6 +69,7 @@ class TestPollsIndex(TestCase):
         self.assertEqual(res_json['pages_count'], 2)
         self.assertEqual(res_json['current_page'], 1)
         self.assertEqual(len(res_json['polls']), 50)
+        self.assertFalse(res_json['polls'][0]['belongs_to_you'])
 
         res = self.client.get('/polls/?user_id=' + str(self.user2.id), HTTP_TOKEN=self.user2.profile.api_token)
         res_json = res.json()
@@ -76,6 +77,7 @@ class TestPollsIndex(TestCase):
         self.assertEqual(res_json['pages_count'], 4)
         self.assertEqual(res_json['current_page'], 1)
         self.assertEqual(len(res_json['polls']), 50)
+        self.assertTrue(res_json['polls'][0]['belongs_to_you'])
 
     def test_single_poll_can_be_shown(self):
         poll1 = self.user1.poll_set.all()[0]

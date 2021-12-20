@@ -24,6 +24,7 @@ class Poll(models.Model):
             'choices': [item.to_json() for item in self.choice_set.order_by('sort').all()],
             'total_votes_count': self.total_votes_count(),
             'user': self.user.profile.to_json(),
+            'belongs_to_you': False
         }
 
         if include_selected_choice_id is not None:
@@ -32,6 +33,10 @@ class Poll(models.Model):
             selected_choice = user.choice_set.filter(poll=self).first()
             if selected_choice != None:
                 output['selected_choice'] = selected_choice.id
+
+        if user is not None:
+            if user == self.user:
+                output['belongs_to_you'] = True
 
         return output
 

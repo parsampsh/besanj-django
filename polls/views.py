@@ -147,4 +147,4 @@ def my_votes(request, user):
             Q(poll__title__contains=searched_phrase) | Q(poll__description__contains=searched_phrase)
         )
 
-    return paginate(choices, request, items_name='polls', item_json=lambda choice: choice.poll.to_json(include_selected_choice_id=choice.id))
+    return paginate(choices, request, items_name='polls', item_json=lambda choice: choice.poll.to_json(include_selected_choice_id=choice.id, user=user))

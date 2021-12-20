@@ -87,6 +87,7 @@ Structure of each item in `polls` key above:
   "created_at": "datetime",
   "total_votes_count": "count of total votes to this poll",
   "user": {...},
+  "belongs_to_you": false,
   "choices": [
     {
       "id": 1,
@@ -101,6 +102,8 @@ Structure of each item in `polls` key above:
 
 There can be a `selected_choice` key in poll json. But it happens only when a user is authenticated and calls this API.
 Then for each poll, IF user has voted to it before, `selected_choice` key will be included which contains ID of selected choice on this poll by user.
+
+The `belongs_to_you` field can be true or false. If the user be authenticated and receive list of the polls, each poll which is for that authenticated user has this field with true value.
 
 ### My Votes: `/polls/my_votes/`
 This API shows user their votes polls.
