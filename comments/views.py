@@ -102,6 +102,6 @@ def comments_on_poll(request):
     except:
         return JsonResponse({'error': 'poll not found'}, status=404)
 
-    comments = poll.comment_set.order_by('-created_at').filter(is_published=True)
+    comments = poll.comment_set.order_by('-created_at').filter(is_published=True).filter(parent_comment=None)
 
     return paginate(comments, request, items_name='comments')
