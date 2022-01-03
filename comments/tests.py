@@ -1,6 +1,7 @@
 from django.test import TestCase, Client
 from .models import *
 from account.models import Profile
+from besanj_backend import pagination_policy
 
 
 class TestCommentCreation(TestCase):
@@ -194,3 +195,22 @@ class TestCommentsList(TestCase):
         self.assertEqual(len(res.json()['comments']), 5)
 
         self.assertEqual(res.json()['comments'][0]['id'], self.comment5.id)
+
+    def test_comments_will_not_be_paginated_if_this_is_set_at_pagination_policy(self):
+        old_value = bool(pagination_policy.COMMENTS_HAVE_PAGINATION)
+
+        pagination_policy.COMMENTS_HAVE_PAGINATION = False
+        res = self.client.get('/comments/poll_comments/?poll_id=' + str(self.poll1.id))
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(len(res.json()['comments']), 5)
+        self.assertFalse('all_count' in res.json())
+        self.assertFalse('current_page' in res.json())
+        self.assertFalse('pages_count' in res.json())
+
+        res = self.client.get('/comments/user_comments/?user_id=' + str(self.user2.id), HTTP_TOKEN='2')
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(len(res.json()['comments']), 3)
+        self.assertTrue('all_count' in res.json())
+        self.assertTrue('current_page' in res.json())
+        self.assertTrue('pages_count' in res.json())
+        pagination_policy.COMMENTS_HAVE_PAGINATION = old_value

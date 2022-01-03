@@ -87,7 +87,7 @@ def comments_by_user(request):
     else:
         comments = user.comment_set.order_by('-created_at').filter(is_published=True)
 
-    return paginate(comments, request, items_name='comments')
+    return paginate(comments, request, items_name='comments', force_paginate_comments=True)
 
 
 def comments_on_poll(request):
