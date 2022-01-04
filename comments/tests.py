@@ -214,3 +214,11 @@ class TestCommentsList(TestCase):
         self.assertTrue('current_page' in res.json())
         self.assertTrue('pages_count' in res.json())
         pagination_policy.COMMENTS_HAVE_PAGINATION = old_value
+
+    def test_comments_contain_their_replies(self):
+        self.comment6 = Comment.objects.create(user=self.user2, poll=self.poll1, text="6", is_published=True, parent_comment=self.comment1)
+        res = self.client.get('/comments/poll_comments/?poll_id=' + str(self.poll1.id))
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(len(res.json()['comments']), 5)
+
+        self.assertEqual(res.json()['comments'][-1]['replies'][0]['text'], '6')

@@ -22,7 +22,10 @@ Structure of comment json:
     "is_published": true,
     "text": "hi",
     "created_at": {...datetime...},
-    "poll_id": 1
+    "poll_id": 1,
+    "replies": [
+        ...list of the comments in reply to this one...
+    ]
 }
 ```
 
@@ -62,11 +65,10 @@ Structure of json response:
 Note: if you send authentication token to this API, unpublished comments will be shown too.
 
 ### Poll Comments: `/comments/poll_comments/`
-This API returns list of comment of a specific poll.
+This API returns list of comment of a specific poll (This one doesn't have pagination).
 
 Arguments:
 - `poll_id`: Id of the poll which you want to get comments of
-- `page`: Page number of pagination
 
 Responses:
 - Returns `404` when the given poll id does not exists
