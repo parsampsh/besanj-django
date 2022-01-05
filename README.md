@@ -58,3 +58,6 @@ or if you use docker compose for development:
 $ sudo docker exec <app-container> python manage.py test
 ```
 
+## Frontend
+The frontend app for this project is available at [here](https://github.com/parsampsh/besanj-frontend)
+
