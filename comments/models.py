@@ -25,7 +25,7 @@ class Comment(models.Model):
             output['parent_comment_id'] = self.parent_comment.id
 
         if not no_replies:
-            replies = Comment.objects.filter(is_published=True, parent_comment=self).order_by('-created_at').all()
+            replies = Comment.objects.filter(is_published=True, parent_comment=self).order_by('created_at').all()
             output['replies'] = [item.to_json() for item in replies]
 
         return output

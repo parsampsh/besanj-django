@@ -194,7 +194,7 @@ class TestCommentsList(TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertEqual(len(res.json()['comments']), 5)
 
-        self.assertEqual(res.json()['comments'][0]['id'], self.comment5.id)
+        self.assertEqual(res.json()['comments'][-1]['id'], self.comment5.id)
 
     def test_comments_will_not_be_paginated_if_this_is_set_at_pagination_policy(self):
         old_value = bool(pagination_policy.COMMENTS_HAVE_PAGINATION)
@@ -221,4 +221,4 @@ class TestCommentsList(TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertEqual(len(res.json()['comments']), 5)
 
-        self.assertEqual(res.json()['comments'][-1]['replies'][0]['text'], '6')
+        self.assertEqual(res.json()['comments'][0]['replies'][0]['text'], '6')

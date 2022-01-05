@@ -83,9 +83,9 @@ def comments_by_user(request):
 
     auth_result, auth_user = _handle_auth_token(request)
     if auth_result and auth_user.id == user.id:
-        comments = user.comment_set.order_by('-created_at')
+        comments = user.comment_set.order_by('created_at')
     else:
-        comments = user.comment_set.order_by('-created_at').filter(is_published=True)
+        comments = user.comment_set.order_by('created_at').filter(is_published=True)
 
     return paginate(comments, request, items_name='comments', force_paginate_comments=True)
 
@@ -102,6 +102,6 @@ def comments_on_poll(request):
     except:
         return JsonResponse({'error': 'poll not found'}, status=404)
 
-    comments = poll.comment_set.order_by('-created_at').filter(is_published=True).filter(parent_comment=None)
+    comments = poll.comment_set.order_by('created_at').filter(is_published=True).filter(parent_comment=None)
 
     return paginate(comments, request, items_name='comments')
