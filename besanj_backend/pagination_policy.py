@@ -30,6 +30,11 @@ def paginate(query, request, items_name='results', per_page=50, status_code=200,
         current_page_number = 1
     current_page = paginator.get_page(current_page_number)
 
+    if current_page_number > paginator.num_pages:
+        current_page_number = paginator.num_pages
+    elif current_page_number < 1:
+        current_page_number = 1
+
     current_page_items = [item_json(item) for item in current_page.object_list]
 
     return JsonResponse({
