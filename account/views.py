@@ -1,3 +1,6 @@
+import datetime
+import string
+import random
 from django.http import JsonResponse
 from .models import User, Profile
 from django.contrib.auth.hashers import make_password, check_password
@@ -121,5 +124,32 @@ def reset_token(request, user):
 
 
 def reset_password(request):
-    """ Resets the user's password (same as forget password) """
-    return JsonResponse({"Hello": "reset_password"})
+    """ Makes a request for user password to be reset """
+    if request.POST.get('username') != None:
+        user = User.objects.filter(username=request.POST.get('username')).first()
+    elif request.POST.get('email') != None:
+        user = User.objects.filter(email=request.POST.get('email')).first()
+    else:
+        return JsonResponse({'error': "Please send username or email"}, status=400)
+
+    old_req = ResetPasswordRequest.objects.filter(user=user)
+    make_new_request = True
+    if old_req.exists():
+        old_req = old_req.first()
+        if old_req.expires_at > datetime.datetime.now():
+            # request is already made, don't make new one
+            make_new_request = False
+            reset_pass_req = old_req
+        else:
+            # the old request is expired, delete it
+            old_req.delete()
+
+    if make_new_request:
+        expires_at = datetime.datetime.now() + datetime.timedelta(hours=2)
+        generated_code = ''.join(random.choice(string.ascii_letters*10) for _ in range(0, 100))
+        reset_pass_req = ResetPasswordRequest.objects.create(user=user, expires_at=expires_at, code=generated_code)
+
+    # send mail to the user
+    # TODO : do it!
+
+    return JsonResponse({'message': 'Password reset link has been sent to your email'})

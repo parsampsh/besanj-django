@@ -25,3 +25,10 @@ class Profile(models.Model):
             token = get_random_string(70)
 
         return token
+
+
+class ResetPasswordRequest(models.Model):
+    """ Requests for password reset """
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    expires_at = models.DateTimeField()
+    code = models.CharField(max_length=100)
