@@ -1,6 +1,8 @@
 import datetime
 import string
 import random
+from django.core.mail import send_mail
+from django.conf import settings
 from django.http import JsonResponse
 from .models import User, Profile, ResetPasswordRequest
 from django.contrib.auth.hashers import make_password, check_password
@@ -153,7 +155,12 @@ def reset_password(request):
         reset_pass_req = ResetPasswordRequest.objects.create(user=user, expires_at=expires_at, code=generated_code)
 
     # send mail to the user
-    # TODO : do it!
+    send_mail(
+        subject='Besanj - Reset Password',
+        message='You requested to reset password of your account in Besanj. here is the link that you can reset your password using it: http://localhost/reset-password/' + reset_pass_req.code, # TODO : change the link in message to what it should be after making it in frontend
+        from_email=settings.EMAIL_HOST_USER,
+        recipient_list=[reset_pass_req.user.email]
+    )
 
     return JsonResponse({'message': 'Password reset link has been sent to your email'})
 
