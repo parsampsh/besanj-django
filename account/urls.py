@@ -8,4 +8,5 @@ urlpatterns = [
     path('whoami/', views.whoami, name="account_whoami"),
     path('reset-token/', views.reset_token, name="account_reset_token"),
     path('reset-password/', views.reset_password, name="account_reset_password"),
+    path('reset-password-final/', views.reset_password_final, name="account_reset_final"),
 ]

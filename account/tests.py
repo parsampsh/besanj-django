@@ -1,5 +1,6 @@
+import datetime
 from django.test import TestCase, Client
-from account.models import User, Profile
+from account.models import User, Profile, ResetPasswordRequest
 from django.contrib.auth.hashers import check_password, make_password
 
 
@@ -117,3 +118,65 @@ class TestToken(TestCase):
         self.assertEqual(res.status_code, 200)
         new_token = res.json()['new_token']
         self.assertNotEquals(token, new_token)
+
+    def test_reset_password_works(self):
+        res = self.client.post('/account/reset-password/')
+        self.assertEqual(res.status_code, 400)
+
+        res = self.client.post('/account/reset-password/', {'username': 'somethingnotfound'})
+        self.assertEqual(res.status_code, 404)
+
+        res = self.client.post('/account/reset-password/', {'email': 'something@not.found'})
+        self.assertEqual(res.status_code, 404)
+
+        res = self.client.post('/account/reset-password/', {'email': self.user.email})
+        self.assertEqual(res.status_code, 200)
+        self.assertTrue(ResetPasswordRequest.objects.filter(user=self.user).exists())
+        req = ResetPasswordRequest.objects.filter(user=self.user).first()
+        expires_at = req.expires_at
+
+        res = self.client.post('/account/reset-password/', {'username': self.user.username})
+        self.assertEqual(res.status_code, 200)
+        req2 = ResetPasswordRequest.objects.filter(user=self.user).first()
+        expires_at2 = req2.expires_at
+
+        self.assertEqual(expires_at, expires_at2)
+        self.assertEqual(req.id, req2.id)
+
+        # let's make request expired
+        req.expires_at = expires_at - datetime.timedelta(hours=4)
+        req.save()
+
+        res = self.client.post('/account/reset-password/', {'username': self.user.username})
+        self.assertEqual(res.status_code, 200)
+
+        try:
+            req.refresh_from_db()
+            self.assertTrue(false)
+        except:
+            pass
+
+        req = ResetPasswordRequest.objects.filter(user=self.user).first()
+        req.expires_at = expires_at - datetime.timedelta(hours=4)
+        req.save()
+
+        res = self.client.post('/account/reset-password-final/')
+        self.assertEqual(res.status_code, 400)
+
+        res = self.client.post('/account/reset-password-final/', {'code': 'wrongshit'})
+        self.assertEqual(res.status_code, 404)
+
+        res = self.client.post('/account/reset-password-final/', {'code': req.code})
+        self.assertEqual(res.status_code, 403)
+
+        req.expires_at = expires_at + datetime.timedelta(hours=4)
+        req.save()
+
+        res = self.client.post('/account/reset-password-final/', {'code': req.code})
+        self.assertEqual(res.status_code, 200)
+
+        res = self.client.post('/account/reset-password-final/', {'code': req.code, 'new_password': 'ThisIsMyNewPassword'})
+        self.assertEqual(res.status_code, 200)
+
+        self.user.refresh_from_db()
+        self.assertTrue(check_password('ThisIsMyNewPassword', self.user.password))

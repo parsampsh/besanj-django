@@ -54,3 +54,32 @@ Response (`200`):
   "new_token": "new-generated-token"
 }
 ```
+
+### Reset Password: `/account/reset-password/` (POST)
+This API makes a reset password request and sends a link to the user's email.
+
+Arguments (ONE of these two):
+- `username`: Username of the user who wants to reset their password
+- `email`: Email of the user who wants to reset their password
+
+Responses:
+- `400`: Arguments not sent
+- `404`: User not found
+- `200`: Email sent successfully
+
+### Reset Password Final: `/account/reset-password-final/` (POST)
+This API finally changes the password using the code that user has received in email using the previous API.
+
+Arguments:
+- `code`: The code that user has received
+- `new_password`: The new password for user (optional)
+
+You can use this API in 2 ways:
+- Check that is the code true or not by sending only `code` argument (can be used before asking user to enter the new password)
+- Change the password by sending both `code` and `new_password`
+
+Responses:
+- `400`: Arguments not sent
+- `404`: Invalid code
+- `403`: Reset password request is expired (will be expired after 2 hours)
+- `200`: If you have sent both `code` and `new_password` this means password is changed successfully and if you only sent `code` this means the code is valid and not expired yet so you can use it to change the password

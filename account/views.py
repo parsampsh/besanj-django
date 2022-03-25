@@ -2,7 +2,7 @@ import datetime
 import string
 import random
 from django.http import JsonResponse
-from .models import User, Profile
+from .models import User, Profile, ResetPasswordRequest
 from django.contrib.auth.hashers import make_password, check_password
 from django.views.decorators.http import require_POST
 from besanj_backend.json_request_decorator import json_request
@@ -132,11 +132,14 @@ def reset_password(request):
     else:
         return JsonResponse({'error': "Please send username or email"}, status=400)
 
+    if user is None:
+        return JsonResponse({'error': "User not found"}, status=404)
+
     old_req = ResetPasswordRequest.objects.filter(user=user)
     make_new_request = True
     if old_req.exists():
         old_req = old_req.first()
-        if old_req.expires_at > datetime.datetime.now():
+        if old_req.expires_at > datetime.datetime.now(datetime.timezone.utc):
             # request is already made, don't make new one
             make_new_request = False
             reset_pass_req = old_req
@@ -145,7 +148,7 @@ def reset_password(request):
             old_req.delete()
 
     if make_new_request:
-        expires_at = datetime.datetime.now() + datetime.timedelta(hours=2)
+        expires_at = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(hours=2)
         generated_code = ''.join(random.choice(string.ascii_letters*10) for _ in range(0, 100))
         reset_pass_req = ResetPasswordRequest.objects.create(user=user, expires_at=expires_at, code=generated_code)
 
@@ -153,3 +156,30 @@ def reset_password(request):
     # TODO : do it!
 
     return JsonResponse({'message': 'Password reset link has been sent to your email'})
+
+
+def reset_password_final(request):
+    """ Final password reset """
+    if request.POST.get('code'):
+        code = request.POST.get('code')
+        req = ResetPasswordRequest.objects.filter(code=code)
+
+        if not req.exists():
+            return JsonResponse({'error': "Invalid code"}, status=404)
+
+        req = req.first()
+        if req.expires_at < datetime.datetime.now(datetime.timezone.utc):
+            return JsonResponse({'error': "The code is expired"}, status=403)
+    else:
+        return JsonResponse({'error': "Please send reset password code"}, status=400)
+
+    if request.POST.get('new_password'):
+        password = request.POST.get('new_password')
+
+        user = req.user
+        user.password = make_password(password)
+        user.save()
+        return JsonResponse({"message": "Password has been changed"}, status=200)
+    else:
+        return JsonResponse({"message": "The code is valid"}, status=200)
+
