@@ -125,6 +125,8 @@ def reset_token(request, user):
     return JsonResponse({"new_token": user.profile.api_token})
 
 
+@json_request
+@require_POST
 def reset_password(request):
     """ Makes a request for user password to be reset """
     if request.POST.get('username') != None:
@@ -165,6 +167,8 @@ def reset_password(request):
     return JsonResponse({'message': 'Password reset link has been sent to your email'})
 
 
+@json_request
+@require_POST
 def reset_password_final(request):
     """ Final password reset """
     if request.POST.get('code'):
