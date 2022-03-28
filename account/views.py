@@ -180,6 +180,7 @@ def reset_password_final(request):
 
         req = req.first()
         if req.expires_at < datetime.datetime.now(datetime.timezone.utc):
+            req.delete()
             return JsonResponse({'error': "The code is expired"}, status=403)
     else:
         return JsonResponse({'error': "Please send reset password code"}, status=400)
@@ -190,6 +191,7 @@ def reset_password_final(request):
         user = req.user
         user.password = make_password(password)
         user.save()
+        req.delete()
         return JsonResponse({"message": "Password has been changed"}, status=200)
     else:
         return JsonResponse({"message": "The code is valid"}, status=200)

@@ -180,3 +180,9 @@ class TestToken(TestCase):
 
         self.user.refresh_from_db()
         self.assertTrue(check_password('ThisIsMyNewPassword', self.user.password))
+
+        try:
+            req.refresh_from_db()
+            self.assertTrue(False)
+        except:
+            pass
