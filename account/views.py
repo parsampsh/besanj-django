@@ -159,7 +159,7 @@ def reset_password(request):
     # send mail to the user
     send_mail(
         subject='Besanj - Reset Password',
-        message='You requested to reset password of your account in Besanj. here is the link that you can reset your password using it: http://localhost/reset-password/' + reset_pass_req.code, # TODO : change the link in message to what it should be after making it in frontend
+        message='You requested to reset password of your account in Besanj. here is the link that you can reset your password using it: http://localhost:3000/reset-password?code=' + reset_pass_req.code,
         from_email=settings.EMAIL_HOST_USER,
         recipient_list=[reset_pass_req.user.email]
     )
